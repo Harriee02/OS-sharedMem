@@ -42,20 +42,27 @@ int  main(int  argc, char *argv[])
             ShmPTR[0], ShmPTR[1], ShmPTR[2], ShmPTR[3]);
 
      printf("Server is about to fork a child process...\n");
-     pid = fork();
+     pid = fork(); // forks and creates a new process
      if (pid < 0) {
           printf("*** fork error (server) ***\n");
           exit(1);
      }
-     else if (pid == 0) {
+     else if (pid == 0) {// child process
           ClientProcess(ShmPTR);
           exit(0);
      }
+	// parent process
+
 		int account;
 		int amount;
 		int i;
+
+		// loop goes 25 times
 		for (i=0; i < 25; i++){
+
+			// random number from 0-5
 			sleep(random() % 6);
+			
 			account = ShmPTR[BankAccount];
 			while (ShmPTR[Turn] != 0){}
 			if (account <= 100){
@@ -74,8 +81,6 @@ int  main(int  argc, char *argv[])
 			ShmPTR[BankAccount] = account;
 			ShmPTR[Turn] = 1;
 		}
-		
-
      wait(&status);
      printf("Server has detected the completion of its child...\n");
      shmdt((void *) ShmPTR);
@@ -91,14 +96,17 @@ void  ClientProcess(int  SharedMem[])
      printf("   Client process started\n");
      printf("   Client found %d %d %d %d in shared memory\n",
                 SharedMem[0], SharedMem[1], SharedMem[2], SharedMem[3]);
+
     int account;
 		int amount;
 		int i;
+		// loop goes 25 times
 		for (i=0; i < 25; i++){
 			sleep(random() % 6);
 			account = SharedMem[BankAccount];
 			while (SharedMem[Turn] != 1){}
 
+			// random number from 0-5
 			amount = sleep(random() % 6);
 			printf("Poor Student needs $%d\n", amount);
 
@@ -112,5 +120,5 @@ void  ClientProcess(int  SharedMem[])
 			SharedMem[BankAccount] = account;
 			SharedMem[Turn] = 0;
 		}
-		 printf("   Client is about to exit\n");
+		 printf("Client is about to exit\n");
 }
